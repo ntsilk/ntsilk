@@ -2,7 +2,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
-@@ -0,0 +1,243 @@
+@@ -0,0 +1,232 @@
 +#include <SKP_Silk_SDK_API.h>
 +
 +#include "codec_internal.h"
@@ -37,13 +37,9 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +
 +    // NTSilkSKPEncoderOptions opts;
 +
-+    double    filetime;
-+    size_t    counter;
-+    int32_t   k, args, totPackets, totActPackets, ret;
-+    int16_t   nBytes;
-+    double    sumBytes, sumActBytes, avg_rate, act_rate, nrg;
-+    int32_t   encSizeBytes;
-+    int32_t   smplsSinceLastPacket = 0;
++    size_t counter;
++    int16_t n_bytes;
++    int32_t samples_since_last_packet;
 +} NTSilkSKPEncoderContext;
 +
 +static int ntsilk_encode_s16le(struct AVCodecContext *avctx, struct AVPacket *avpkt,
@@ -60,7 +56,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +    //     break;
 +    // }
 +
-+    sctx->nBytes = MAX_PAYLOAD_BYTES;
++    sctx->n_bytes = MAX_PAYLOAD_BYTES;
 +
 +    // 2 = s16 header
 +    if ((ret = ff_alloc_packet(avctx, avpkt, MAX_OUT_BYTES)) < 0)
@@ -72,26 +68,24 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +        frame->data[0],
 +        sctx->counter,
 +        avpkt->data + 2, // sizeof(int16_t)
-+        sctx.nBytes); // Must use sctx.nBytes and not avpkt->size as it's I/O par
++        sctx.n_bytes); // Must use sctx.n_bytes and not avpkt->size as it's I/O par
 +    if (err) {
 +        av_log(avctx, AV_LOG_ERROR,
 +             "Error encoding frame: %d\n", err);
 +        return ff_ntsilk_error_to_averror(err);
 +    }
 +
-+    sctx->smplsSinceLastPacket += sctx->counter;
++    sctx->samples_since_last_packet += sctx->counter;
 +
-+    if( ( ( 1000 * sctx->smplsSinceLastPacket ) / sctx->enc_control.API_sampleRate ) == 20 ) {
++    if( ( ( 1000 * sctx->samples_since_last_packet ) / sctx->enc_control.API_sampleRate ) == 20 ) {
 +      // Always true
 +
-+      sctx->totPackets++;
++      memcpy(avpkt->data, sctx.n_bytes, 2);
 +
-+      memcpy(avpkt->data, sctx.nBytes, 2);
-+
-+      sctx->smplsSinceLastPacket = 0;
++      sctx->samples_since_last_packet = 0;
 +    }
 +
-+    av_shrink_packet(avpkt, sctx->nBytes);
++    av_shrink_packet(avpkt, sctx->n_bytes);
 +
 +    *get_packet_ptr = 1;
 +
@@ -139,12 +133,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +
 +    err = SKP_Silk_SDK_InitEncoder(sctx->enc, sctx->enc_status);
 +
-+    sctx->totPackets           = 0;
-+    sctx->totActPackets        = 0;
-+    sctx->smplsSinceLastPacket = 0;
-+    sctx->sumBytes             = 0.0;
-+    sctx->sumActBytes          = 0.0;
-+    sctx->smplsSinceLastPacket = 0;
++    sctx->samples_since_last_packet = 0;
 +
 +    sctx->enc = enc;
 +
