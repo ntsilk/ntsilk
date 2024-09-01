@@ -2,7 +2,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
-@@ -0,0 +1,243 @@
+@@ -0,0 +1,240 @@
 +#include <SKP_Silk_SDK_API.h>
 +
 +#include "libavutil/channel_layout.h"
@@ -104,7 +104,6 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +{
 +    int err;
 +    NTSilkSKPEncoderContext *sctx = avctx->priv_data;
-+    void *enc;
 +    int32_t enc_size;
 +
 +    // Set encoder par
@@ -143,8 +142,6 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +    err = SKP_Silk_SDK_InitEncoder(sctx->enc, &sctx->enc_status);
 +
 +    sctx->samples_since_last_packet = 0;
-+
-+    sctx->enc = enc;
 +
 +    return 0;
 +}
