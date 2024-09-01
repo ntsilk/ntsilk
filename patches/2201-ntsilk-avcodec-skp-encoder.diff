@@ -2,7 +2,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
-@@ -0,0 +1,238 @@
+@@ -0,0 +1,243 @@
 +#include <SKP_Silk_SDK_API.h>
 +
 +#include "libavutil/channel_layout.h"
@@ -133,7 +133,12 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +        return ff_ntsilk_error_to_averror(err);
 +    }
 +
-+    av_malloc(enc_size);
++    sctx->enc = av_malloc(enc_size);
++    if (!sctx->enc) {
++        av_log(avctx, AV_LOG_FATAL,
++               "Failed to alloc memory for encoder.\n");
++        return AVERROR(ENOMEM);
++    }
 +
 +    err = SKP_Silk_SDK_InitEncoder(sctx->enc, &sctx->enc_status);
 +
