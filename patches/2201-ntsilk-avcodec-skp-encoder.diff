@@ -2,7 +2,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
-@@ -0,0 +1,236 @@
+@@ -0,0 +1,238 @@
 +#include <SKP_Silk_SDK_API.h>
 +
 +#include "libavutil/channel_layout.h"
@@ -154,6 +154,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +}
 +
 +static const AVOption ntsilkenc_options[] = {
++    {0},
 +};
 +
 +static const AVClass ntsilkenc_class = {
@@ -176,6 +177,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +};
 +
 +static const FFCodecDefault ntsilkenc_defaults[] = {
++    {0},
 +};
 +
 +const FFCodec ff_ntsilk_skp_s16le_encoder = {
