@@ -1,0 +1,12 @@
+Index: ntsilk/ffmpeg/libavcodec/Makefile
+===================================================================
+--- ntsilk.orig/ffmpeg/libavcodec/Makefile
++++ ntsilk/ffmpeg/libavcodec/Makefile
+@@ -574,6 +574,7 @@ OBJS-$(CONFIG_MXPEG_DECODER)           +
+ OBJS-$(CONFIG_NELLYMOSER_DECODER)      += nellymoserdec.o nellymoser.o
+ OBJS-$(CONFIG_NELLYMOSER_ENCODER)      += nellymoserenc.o nellymoser.o
+ OBJS-$(CONFIG_NOTCHLC_DECODER)         += notchlc.o
++OBJS-$(CONFIG_NTSILK_SKP_S16LE_ENCODER) += ntsilk_skp.o ntsilk_skp_enc.o
+ OBJS-$(CONFIG_NUV_DECODER)             += nuv.o rtjpeg.o jpegquanttables.o
+ OBJS-$(CONFIG_ON2AVC_DECODER)          += on2avc.o on2avcdata.o
+ OBJS-$(CONFIG_OPUS_DECODER)            += opusdec.o opusdec_celt.o opus_celt.o \

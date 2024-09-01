@@ -1,1 +1,6 @@
-0001-ntsilk-codecid.diff
+0001-ntsilk-avcodec-codecid.diff
+0021-ntsilk-avcodec-desc-s16le.diff
+0061-ntsilk-avcodec-makefile-skp-encoder.diff
+0101-ntsilk-avcodec-allcodecs-skp-s16le-encoder.diff
+1401-ntsilk-avcodec-skp.diff
+2201-ntsilk-avcodec-skp-encoder.diff

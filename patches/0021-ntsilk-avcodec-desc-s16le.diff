@@ -1,0 +1,18 @@
+Index: ntsilk/ffmpeg/libavcodec/codec_desc.c
+===================================================================
+--- ntsilk.orig/ffmpeg/libavcodec/codec_desc.c
++++ ntsilk/ffmpeg/libavcodec/codec_desc.c
+@@ -3105,6 +3105,13 @@ static const AVCodecDescriptor codec_des
+         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+     },
+     {
++        .id        = AV_CODEC_ID_NTSILK_S16LE,
++        .type      = AVMEDIA_TYPE_AUDIO,
++        .name      = "ntsilk_s16le",
++        .long_name = NULL_IF_CONFIG_SMALL("NTSilk (s16le)"),
++        .props     = AV_CODEC_PROP_LOSSY,
++    },
++    {
+         .id        = AV_CODEC_ID_OPUS,
+         .type      = AVMEDIA_TYPE_AUDIO,
+         .name      = "opus",

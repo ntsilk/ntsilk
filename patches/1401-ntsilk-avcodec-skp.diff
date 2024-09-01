@@ -1,0 +1,28 @@
+Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp.c
+===================================================================
+--- /dev/null
++++ ntsilk/ffmpeg/libavcodec/ntsilk_skp.c
+@@ -0,0 +1,12 @@
++#include <SKP_Silk_errors.h>
++
++#include "ntsilk_skp.h"
++#include "libavutil/error.h"
++
++int ff_ntsilk_error_to_averror(int err)
++{
++    switch (err) {
++    default:
++        return AVERROR(EINVAL);
++    }
++}
+Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
+===================================================================
+--- /dev/null
++++ ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
+@@ -0,0 +1,6 @@
++#ifndef AVCODEC_NTSILK_SKP_H
++#define AVCODEC_NTSILK_SKP_H
++
++int ff_ntsilk_error_to_averror(int err);
++
++#endif /* AVCODEC_NTSILK_SKP_H */
