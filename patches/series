@@ -4,3 +4,6 @@
 0101-ntsilk-avcodec-allcodecs-skp-s16le-encoder.diff
 1401-ntsilk-avcodec-skp.diff
 2201-ntsilk-avcodec-skp-encoder.diff
+3061-ntsilk-avformat-makefile.diff
+3101-ntsilk-avformat-allformats.diff
+4401-ntsilk-avformat-muxer.diff

@@ -1,0 +1,15 @@
+Index: ntsilk/ffmpeg/libavformat/Makefile
+===================================================================
+--- ntsilk.orig/ffmpeg/libavformat/Makefile
++++ ntsilk/ffmpeg/libavformat/Makefile
+@@ -410,6 +410,10 @@ OBJS-$(CONFIG_NC_DEMUXER)
+ OBJS-$(CONFIG_NISTSPHERE_DEMUXER)        += nistspheredec.o pcm.o
+ OBJS-$(CONFIG_NSP_DEMUXER)               += nspdec.o pcm.o
+ OBJS-$(CONFIG_NSV_DEMUXER)               += nsvdec.o
++OBJS-$(CONFIG_NTSILK_SKP_S16LE_DEMUXER)  += ntsilk.o rawdec.o
++OBJS-$(CONFIG_NTSILK_SKP_S16LE_MUXER)    += ntsilk.o rawenc.o
++OBJS-$(CONFIG_NTSILK_TCT_S16LE_DEMUXER)  += ntsilk.o rawdec.o
++OBJS-$(CONFIG_NTSILK_TCT_S16LE_MUXER)    += ntsilk.o rawenc.o
+ OBJS-$(CONFIG_NULL_MUXER)                += nullenc.o
+ OBJS-$(CONFIG_NUT_DEMUXER)               += nutdec.o nut.o
+ OBJS-$(CONFIG_NUT_MUXER)                 += nutenc.o nut.o
