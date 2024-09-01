@@ -2,7 +2,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
-@@ -0,0 +1,240 @@
+@@ -0,0 +1,239 @@
 +#include <SKP_Silk_SDK_API.h>
 +
 +#include "libavutil/channel_layout.h"
@@ -81,15 +81,14 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +
 +    sctx->samples_since_last_packet += sctx->counter;
 +
-+    if( ( ( 1000 * sctx->samples_since_last_packet ) / sctx->enc_control.API_sampleRate ) == 20 ) {
-+      // Always true
++    // if( ( ( 1000 * sctx->samples_since_last_packet ) / sctx->enc_control.API_sampleRate ) == 20 ) {
++    // Always true
++    memcpy(avpkt->data, &sctx->n_bytes, 2);
 +
-+      memcpy(avpkt->data, &sctx->n_bytes, 2);
++    sctx->samples_since_last_packet = 0;
++    // }
 +
-+      sctx->samples_since_last_packet = 0;
-+    }
-+
-+    av_shrink_packet(avpkt, sctx->n_bytes);
++    av_shrink_packet(avpkt, sctx->n_bytes + 2);
 +
 +    *got_packet_ptr = 1;
 +
