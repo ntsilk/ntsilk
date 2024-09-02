@@ -2,26 +2,11 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp.c
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavcodec/ntsilk_skp.c
-@@ -0,0 +1,12 @@
+@@ -0,0 +1,27 @@
 +#include <SKP_Silk_errors.h>
 +
 +#include "ntsilk_skp.h"
 +#include "libavutil/error.h"
-+
-+int ff_ntsilk_error_to_averror(int err)
-+{
-+    switch (err) {
-+    default:
-+        return AVERROR(EINVAL);
-+    }
-+}
-Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
-===================================================================
---- /dev/null
-+++ ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
-@@ -0,0 +1,21 @@
-+#ifndef AVCODEC_NTSILK_SKP_H
-+#define AVCODEC_NTSILK_SKP_H
 +
 +// Max avctx->bit_rate: 320 kbps, means 320 Kb data in 1s
 +// Max FRAME_LENGTH_MS: 20ms    , means 50 frames   in 1s
@@ -37,6 +22,35 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
 +const int16_t ENCODER_MAX_OUT_BYTES     = ENCODER_MAX_PAYLOAD_BYTES + 2; // sizeof(int16_t)
 +
 +const size_t DECODER_MAX_INPUT_FRAMES   = 5;
++
++int ff_ntsilk_error_to_averror(int err)
++{
++    switch (err) {
++    default:
++        return AVERROR(EINVAL);
++    }
++}
+Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
+===================================================================
+--- /dev/null
++++ ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
+@@ -0,0 +1,20 @@
++#ifndef AVCODEC_NTSILK_SKP_H
++#define AVCODEC_NTSILK_SKP_H
++
++#include <stdint.h>
++
++extern const size_t COMMON_MAX_BYTES_PER_FRAME;
++extern const size_t COMMON_FRAME_LENGTH_MS;
++extern const size_t COMMON_MAX_API_FS_KHZ;
++extern const size_t COMMON_MAX_INPUT_SIZE;
++extern const size_t COMMON_MAX_INPUT_SAMPLES;
++
++extern const size_t ENCODER_MAX_INPUT_FRAMES;
++extern const int16_t ENCODER_MAX_PAYLOAD_BYTES;
++extern const int16_t ENCODER_MAX_OUT_BYTES;
++
++extern const size_t DECODER_MAX_INPUT_FRAMES;
 +
 +int ff_ntsilk_error_to_averror(int err);
 +

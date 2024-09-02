@@ -2,7 +2,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
-@@ -0,0 +1,193 @@
+@@ -0,0 +1,196 @@
 +#include <SKP_Silk_SDK_API.h>
 +
 +#include "libavutil/mem.h"
@@ -39,6 +39,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
 +    NTSilkSKPDecoderContext *sctx = avctx->priv_data;
 +    int16_t len;
 +    // int16_t n_bytes;
++    int16_t *out;
 +
 +    frame->nb_samples = COMMON_MAX_INPUT_SAMPLES; // 20ms * 48000Hz / 1000ms/s = 960 samples
 +    err = ff_get_buffer(avctx, frame, 0);
@@ -53,29 +54,31 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
 +    // lost = 0;
 +    // n_bytes = nBytesPerPacket[ 0 ];
 +    // payloadToDec = payload;
-+    outPtr = out;
++    // outPtr = out;
++    out = (int16_t *)frame->data[0];
 +    frame->nb_samples = 0;
 +    // frames = 0;
 +    do {
 +        /* Decode 20 ms */
-+        ret = SKP_Silk_SDK_Decode(
++        err = SKP_Silk_SDK_Decode(
 +            sctx->dec,
 +            &sctx->dec_control,
 +            0,
 +            avpkt->data + 2,
 +            avpkt->size,
-+            outPtr,
-+            &sctx->len
++            out,
++            &len
 +            );
-+        if (ret) {
-+            printf( "\nSKP_Silk_SDK_Decode returned %d", ret );
++        if (err) {
 +            av_log(avctx, AV_LOG_ERROR,
 +                   "Error decoding frame: %d\n", err);
 +            return ff_ntsilk_error_to_averror(err);
 +        }
 +
 +        // frames++;
-+        outPtr += len;
++
++        // Unlike memcpy() etc., add len (offset) directly as data type's int16_t
++        out += len;
 +        frame->nb_samples += len;
 +
 +        // if (frames > DECODER_MAX_INPUT_FRAMES) {
@@ -87,7 +90,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
 +
 +    } while(sctx->dec_control.moreInternalDecoderFrames);
 +
-+    memcpy(frame->data[0], out, frame->nb_samples * 2);
++    // memcpy(frame->data[0], out, frame->nb_samples * 2);
 +
 +    // // Update buffer
 +    // totBytes = 0;
@@ -138,7 +141,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
 +        return ff_ntsilk_error_to_averror(err);
 +    }
 +
-+    sctx->totBytes = 0;
++    // sctx->totBytes = 0;
 +    // sctx->payloadEnd = sctx->payload;
 +
 +    return 0;
@@ -182,7 +185,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
 +    .p.type          = AVMEDIA_TYPE_AUDIO,
 +    .p.id            = AV_CODEC_ID_NTSILK_S16LE,
 +
-+    .p.defaults      = ntsilkdec_defaults,
++    .defaults        = ntsilkdec_defaults,
 +
 +    .init            = ntsilk_decode_init,
 +    .close           = ntsilk_decode_close,
