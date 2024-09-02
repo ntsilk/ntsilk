@@ -2,7 +2,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
-@@ -0,0 +1,239 @@
+@@ -0,0 +1,233 @@
 +#include <SKP_Silk_SDK_API.h>
 +
 +#include "libavutil/channel_layout.h"
@@ -12,17 +12,6 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +#include "codec_internal.h"
 +#include "encode.h"
 +#include "ntsilk_skp.h"
-+
-+// Max avctx->bit_rate: 320 kbps, means 320 Kb data in 1s
-+// Max FRAME_LENGTH_MS: 20ms    , means 50 frames   in 1s
-+// => 320/50 = 6.4 Kb = 6400 b = 800 Bytes in one frame
-+const size_t MAX_BYTES_PER_FRAME = 800; // Equals peak bitrate of 320 kbps
-+const size_t MAX_INPUT_FRAMES    = 1;
-+const size_t FRAME_LENGTH_MS     = 20;
-+const size_t MAX_API_FS_KHZ      = 48;
-+const size_t MAX_INPUT_SIZE      = FRAME_LENGTH_MS * MAX_API_FS_KHZ * MAX_INPUT_FRAMES;
-+const int16_t MAX_PAYLOAD_BYTES  = MAX_BYTES_PER_FRAME * MAX_INPUT_FRAMES;
-+const int16_t MAX_OUT_BYTES      = MAX_PAYLOAD_BYTES + 2; // sizeof(int16_t)
 +
 +// typedef struct NTSilkSKPEncoderOptions {
 +// } NTSilkSKPEncoderOptions;
@@ -34,16 +23,14 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +
 +    void                          *enc;
 +
-+    // uint8_t in[MAX_INPUT_SIZE];
-+    // uint8_t out[MAX_PAYLOAD_BYTES];
++    // uint8_t in[COMMON_MAX_INPUT_SIZE];
++    // uint8_t out[ENCODER_MAX_PAYLOAD_BYTES];
 +
 +    // AudioFrameQueue afq;
 +
 +    // NTSilkSKPEncoderOptions opts;
 +
-+    size_t counter;
-+    int16_t n_bytes;
-+    int32_t samples_since_last_packet;
++    // int32_t samples_since_last_packet;
 +} NTSilkSKPEncoderContext;
 +
 +static int ntsilk_encode_s16le(struct AVCodecContext *avctx, struct AVPacket *avpkt,
@@ -51,44 +38,46 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +{
 +    int err;
 +    NTSilkSKPEncoderContext *sctx = avctx->priv_data;
++    size_t counter;
++    int16_t n_bytes;
 +
 +    // frame is not null
-+    sctx->counter = frame->nb_samples; // 20ms * 48000Hz / 1000ms/s = 960 samples
++    counter = frame->nb_samples; // 20ms * 48000Hz / 1000ms/s = 960 samples
 +
 +    // // Cut the last audio samples that < 20ms
 +    // if (counter < ((20 * sctx->enc_control.API_sampleRate) / 1000)) {
 +    //     break;
 +    // }
 +
-+    sctx->n_bytes = MAX_PAYLOAD_BYTES;
++    n_bytes = ENCODER_MAX_PAYLOAD_BYTES;
 +
 +    // 2 = s16 header
-+    if ((err = ff_alloc_packet(avctx, avpkt, MAX_OUT_BYTES)) < 0)
++    if ((err = ff_alloc_packet(avctx, avpkt, ENCODER_MAX_OUT_BYTES)) < 0)
 +        return err;
 +
 +    err = SKP_Silk_SDK_Encode(
 +        sctx->enc,
 +        &sctx->enc_control,
 +        (const int16_t *)frame->data[0],
-+        sctx->counter,
++        counter,
 +        avpkt->data + 2, // sizeof(int16_t)
-+        &sctx->n_bytes); // Must use sctx.n_bytes and not avpkt->size as it's I/O par
++        &n_bytes); // Must use sctx.n_bytes and not avpkt->size as it's I/O par
 +    if (err) {
 +        av_log(avctx, AV_LOG_ERROR,
 +             "Error encoding frame: %d\n", err);
 +        return ff_ntsilk_error_to_averror(err);
 +    }
 +
-+    sctx->samples_since_last_packet += sctx->counter;
++    // sctx->samples_since_last_packet += sctx->counter;
 +
 +    // if( ( ( 1000 * sctx->samples_since_last_packet ) / sctx->enc_control.API_sampleRate ) == 20 ) {
 +    // Always true
-+    memcpy(avpkt->data, &sctx->n_bytes, 2);
++    memcpy(avpkt->data, &n_bytes, 2);
 +
-+    sctx->samples_since_last_packet = 0;
++    // sctx->samples_since_last_packet = 0;
 +    // }
 +
-+    av_shrink_packet(avpkt, sctx->n_bytes + 2);
++    av_shrink_packet(avpkt, n_bytes + 2);
 +
 +    *got_packet_ptr = 1;
 +
@@ -106,7 +95,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +    int32_t enc_size;
 +
 +    // Set encoder par
-+    sctx->enc_control.API_sampleRate                 = avctx->sample_rate;                                  // Input sample rate
++    sctx->enc_control.API_sampleRate                 = avctx->sample_rate;                                 // Input sample rate
 +    sctx->enc_control.maxInternalSampleRate          = 24000;                                              // Output sample rate
 +    sctx->enc_control.packetSize = avctx->frame_size = 20 /* ms */ * avctx->sample_rate / 1000 /* s/ms */; // Input frame(packet) size
 +    sctx->enc_control.packetLossPercentage           = 0;
@@ -139,8 +128,13 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +    }
 +
 +    err = SKP_Silk_SDK_InitEncoder(sctx->enc, &sctx->enc_status);
++    if (err) {
++        av_log(avctx, AV_LOG_FATAL,
++               "Failed to create encoder: %d\n", err);
++        return ff_ntsilk_error_to_averror(err);
++    }
 +
-+    sctx->samples_since_last_packet = 0;
++    // sctx->samples_since_last_packet = 0;
 +
 +    return 0;
 +}
