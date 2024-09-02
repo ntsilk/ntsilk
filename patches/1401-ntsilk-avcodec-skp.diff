@@ -19,9 +19,24 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
-@@ -0,0 +1,6 @@
+@@ -0,0 +1,21 @@
 +#ifndef AVCODEC_NTSILK_SKP_H
 +#define AVCODEC_NTSILK_SKP_H
++
++// Max avctx->bit_rate: 320 kbps, means 320 Kb data in 1s
++// Max FRAME_LENGTH_MS: 20ms    , means 50 frames   in 1s
++// => 320/50 = 6.4 Kb = 6400 b = 800 Bytes in one frame
++const size_t COMMON_MAX_BYTES_PER_FRAME = 800; // Equals peak bitrate of 320 kbps
++const size_t COMMON_FRAME_LENGTH_MS     = 20;
++const size_t COMMON_MAX_API_FS_KHZ      = 48;
++const size_t COMMON_MAX_INPUT_SIZE      = COMMON_FRAME_LENGTH_MS * COMMON_MAX_API_FS_KHZ;
++const size_t COMMON_MAX_INPUT_SAMPLES   = COMMON_FRAME_LENGTH_MS * COMMON_MAX_API_FS_KHZ;
++
++const size_t ENCODER_MAX_INPUT_FRAMES   = 1;
++const int16_t ENCODER_MAX_PAYLOAD_BYTES = COMMON_MAX_BYTES_PER_FRAME * ENCODER_MAX_INPUT_FRAMES;
++const int16_t ENCODER_MAX_OUT_BYTES     = ENCODER_MAX_PAYLOAD_BYTES + 2; // sizeof(int16_t)
++
++const size_t DECODER_MAX_INPUT_FRAMES   = 5;
 +
 +int ff_ntsilk_error_to_averror(int err);
 +
