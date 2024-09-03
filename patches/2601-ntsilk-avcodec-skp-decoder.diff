@@ -2,7 +2,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
-@@ -0,0 +1,196 @@
+@@ -0,0 +1,197 @@
 +#include <SKP_Silk_SDK_API.h>
 +
 +#include "libavutil/mem.h"
@@ -29,7 +29,6 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
 +    // int16_t nBytesPerPacket[ MAX_LBRR_DELAY + 1 ];
 +    // int16_t totBytes;
 +    // int16_t out[ ( ( FRAME_LENGTH_MS * MAX_API_FS_KHZ ) << 1 ) * DECODER_MAX_INPUT_FRAMES ], *outPtr;
-+    // int32_t frames;
 +} NTSilkSKPDecoderContext;
 +
 +static int ntsilk_decode_s16le(AVCodecContext *avctx, AVFrame *frame,
@@ -40,6 +39,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
 +    int16_t len;
 +    // int16_t n_bytes;
 +    int16_t *out;
++    // int32_t frames = 0;
 +
 +    frame->nb_samples = COMMON_MAX_INPUT_SAMPLES; // 20ms * 48000Hz / 1000ms/s = 960 samples
 +    err = ff_get_buffer(avctx, frame, 0);
@@ -82,10 +82,11 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
 +        frame->nb_samples += len;
 +
 +        // if (frames > DECODER_MAX_INPUT_FRAMES) {
-+        //     // Hack for corrupt stream that could generate too many frames
-+        //     outPtr  = out;
++        //     av_log(avctx, AV_LOG_WARNING,
++        //            "Corrupt stream detected\n");
++        //     out = (int16_t *)frame->data[0];
 +        //     frame->nb_samples = 0;
-+        //     frames  = 0;
++        //     frames = 0;
 +        // }
 +
 +    } while(sctx->dec_control.moreInternalDecoderFrames);
