@@ -2,7 +2,7 @@ Index: ntsilk/ffmpeg/libavformat/ntsilk.c
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavformat/ntsilk.c
-@@ -0,0 +1,187 @@
+@@ -0,0 +1,197 @@
 +#include "config_components.h"
 +
 +#include "avformat.h"
@@ -52,6 +52,7 @@ Index: ntsilk/ffmpeg/libavformat/ntsilk.c
 +    st->codecpar->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
 +    st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
 +    ffstream(st)->need_parsing = AVSTREAM_PARSE_FULL_RAW;
++    st->start_time = 0;
 +    avpriv_set_pts_info(st, 64, 1, st->codecpar->sample_rate);
 +
 +    return 0;
@@ -63,7 +64,7 @@ Index: ntsilk/ffmpeg/libavformat/ntsilk.c
 +    AVStream *st;
 +    int64_t pos;
 +
-+    pos = avio_skip(pb, sizeof(NTSILK_SKP_HEADER));
++    pos = avio_skip(pb, sizeof(NTSILK_TCT_HEADER));
 +    if (pos < 0) {
 +        return pos;
 +    }
@@ -77,6 +78,7 @@ Index: ntsilk/ffmpeg/libavformat/ntsilk.c
 +    st->codecpar->ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
 +    st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
 +    ffstream(st)->need_parsing = AVSTREAM_PARSE_FULL_RAW;
++    st->start_time = 0;
 +    avpriv_set_pts_info(st, 64, 1, st->codecpar->sample_rate);
 +
 +    return 0;
@@ -112,6 +114,9 @@ Index: ntsilk/ffmpeg/libavformat/ntsilk.c
 +    .p.mime_type       = "audio/SILK",
 +    .p.extensions      = "silk",
 +
++    .p.priv_class      = &ff_raw_demuxer_class,
++    .priv_data_size    = sizeof(FFRawDemuxerContext),
++
 +    .p.flags           = AVFMT_NOTIMESTAMPS
 +                         | AVFMT_GENERIC_INDEX,
 +    .flags_internal    = FF_OFMT_FLAG_MAX_ONE_OF_EACH
@@ -120,6 +125,7 @@ Index: ntsilk/ffmpeg/libavformat/ntsilk.c
 +    .read_probe        = ntsilk_probe_skp,
 +    .read_header       = ntsilk_read_header_skp,
 +    .read_packet       = ff_raw_read_partial_packet,
++    .raw_codec_id      = AV_CODEC_ID_NTSILK_S16LE,
 +};
 +
 +#endif /* CONFIG_NTSILK_SKP_S16LE_DEMUXER */
@@ -132,6 +138,9 @@ Index: ntsilk/ffmpeg/libavformat/ntsilk.c
 +    .p.mime_type       = "audio/SILK",
 +    .p.extensions      = "ntsilk",
 +
++    .p.priv_class      = &ff_raw_demuxer_class,
++    .priv_data_size    = sizeof(FFRawDemuxerContext),
++
 +    .p.flags           = AVFMT_NOTIMESTAMPS
 +                         | AVFMT_GENERIC_INDEX,
 +    .flags_internal    = FF_OFMT_FLAG_MAX_ONE_OF_EACH
@@ -140,6 +149,7 @@ Index: ntsilk/ffmpeg/libavformat/ntsilk.c
 +    .read_probe        = ntsilk_probe_tct,
 +    .read_header       = ntsilk_read_header_tct,
 +    .read_packet       = ff_raw_read_partial_packet,
++    .raw_codec_id      = AV_CODEC_ID_NTSILK_S16LE,
 +};
 +
 +#endif /* CONFIG_NTSILK_TCT_S16LE_DEMUXER */
