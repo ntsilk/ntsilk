@@ -1,9 +1,9 @@
 <div align="center">
 
-<a href="https://ntsilk.ilharper.com" target="_blank" rel="noopener noreferrer">
-<h1>NTSilk</h1>
-</a>
-<p>优雅地使用 SILK</p>
+# [NTSilk](https://ntsilk.ilharper.com)
+
+优雅地使用 SILK
+
 </div>
 
 ## 快速开始
@@ -19,6 +19,10 @@ ffmpeg -i my.mp3 my.ntsilk
 ```sh
 ffmpeg -i my.ntsilk my.mp3
 ```
+
+## 反馈
+
+如果遇到问题，则可以在 Bugtracker 上 [创建一个 Issue](https://github.com/ntsilk/bugtracker/issues/new/choose)。
 
 ## 许可
 
