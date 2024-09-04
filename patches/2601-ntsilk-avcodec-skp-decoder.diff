@@ -113,7 +113,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_dec.c
 +    NTSilkSKPDecoderContext *sctx = avctx->priv_data;
 +    int32_t dec_size;
 +
-+    avctx->sample_rate = 48000;
++    avctx->sample_rate = 24000;
 +    avctx->sample_fmt = AV_SAMPLE_FMT_S16;
 +
 +    sctx->dec_control.API_sampleRate = 24000;
