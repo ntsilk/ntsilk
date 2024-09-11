@@ -2,7 +2,7 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
-@@ -0,0 +1,233 @@
+@@ -0,0 +1,239 @@
 +#include <SKP_Silk_SDK_API.h>
 +
 +#include "libavutil/channel_layout.h"
@@ -103,14 +103,20 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp_enc.c
 +    sctx->enc_control.useDTX                         = 0;
 +    sctx->enc_control.complexity                     = 2;
 +
-+    if (!avctx->bit_rate) {
-+        sctx->enc_control.bitRate = avctx->bit_rate       = 25000;
-+        av_log(avctx, AV_LOG_WARNING,
-+               "No bit rate set. Defaulting to %"PRId64" bps.\n", avctx->bit_rate);
-+    }
-+    else {
-+        sctx->enc_control.bitRate = avctx->bit_rate;
-+    }
++    // if (!avctx->bit_rate) {
++    //     sctx->enc_control.bitRate = avctx->bit_rate       = 25000;
++    //     av_log(avctx, AV_LOG_WARNING,
++    //            "No bit rate set. Defaulting to %"PRId64" bps.\n", avctx->bit_rate);
++    // }
++    // else {
++    //     sctx->enc_control.bitRate = avctx->bit_rate;
++    // }
++
++    // AF limit: 150 bytes
++    // Max bitrate:
++    // 150 (bytes) * 1000ms/s / 20ms = 7500byte = 60000bps
++    // To prevent data overflow, set target bitrate to 30000bps
++    sctx->enc_control.bitRate = avctx->bit_rate = 30000;
 +
 +    // Init encoder
 +    err = SKP_Silk_SDK_Get_Encoder_Size(&enc_size);
