@@ -34,10 +34,11 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
 ===================================================================
 --- /dev/null
 +++ ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
-@@ -0,0 +1,20 @@
+@@ -0,0 +1,21 @@
 +#ifndef AVCODEC_NTSILK_SKP_H
 +#define AVCODEC_NTSILK_SKP_H
 +
++#include <stddef.h>
 +#include <stdint.h>
 +
 +extern const size_t COMMON_MAX_BYTES_PER_FRAME;
