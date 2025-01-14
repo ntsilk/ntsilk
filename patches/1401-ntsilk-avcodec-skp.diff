@@ -1,8 +1,8 @@
 Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp.c
 ===================================================================
---- /dev/null
-+++ ntsilk/ffmpeg/libavcodec/ntsilk_skp.c
-@@ -0,0 +1,27 @@
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ntsilk/ffmpeg/libavcodec/ntsilk_skp.c	2025-01-13 21:34:18.614952454 +0800
+@@ -0,0 +1,28 @@
 +#include <SKP_Silk_errors.h>
 +
 +#include "ntsilk_skp.h"
@@ -14,12 +14,13 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp.c
 +const size_t COMMON_MAX_BYTES_PER_FRAME = 800; // Equals peak bitrate of 320 kbps
 +const size_t COMMON_FRAME_LENGTH_MS     = 20;
 +const size_t COMMON_MAX_API_FS_KHZ      = 48;
-+const size_t COMMON_MAX_INPUT_SIZE      = COMMON_FRAME_LENGTH_MS * COMMON_MAX_API_FS_KHZ;
-+const size_t COMMON_MAX_INPUT_SAMPLES   = COMMON_FRAME_LENGTH_MS * COMMON_MAX_API_FS_KHZ;
++// Bake these values for compatibility with gcc < 8.1
++const size_t COMMON_MAX_INPUT_SIZE      = 960; // COMMON_FRAME_LENGTH_MS * COMMON_MAX_API_FS_KHZ
++const size_t COMMON_MAX_INPUT_SAMPLES   = 960; // COMMON_FRAME_LENGTH_MS * COMMON_MAX_API_FS_KHZ
 +
 +const size_t ENCODER_MAX_INPUT_FRAMES   = 1;
-+const int16_t ENCODER_MAX_PAYLOAD_BYTES = COMMON_MAX_BYTES_PER_FRAME * ENCODER_MAX_INPUT_FRAMES;
-+const int16_t ENCODER_MAX_OUT_BYTES     = ENCODER_MAX_PAYLOAD_BYTES + 2; // sizeof(int16_t)
++const int16_t ENCODER_MAX_PAYLOAD_BYTES = 800; // COMMON_MAX_BYTES_PER_FRAME * ENCODER_MAX_INPUT_FRAMES
++const int16_t ENCODER_MAX_OUT_BYTES     = 802; // ENCODER_MAX_PAYLOAD_BYTES + 2 // sizeof(int16_t)
 +
 +const size_t DECODER_MAX_INPUT_FRAMES   = 5;
 +
@@ -32,8 +33,8 @@ Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp.c
 +}
 Index: ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
 ===================================================================
---- /dev/null
-+++ ntsilk/ffmpeg/libavcodec/ntsilk_skp.h
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ ntsilk/ffmpeg/libavcodec/ntsilk_skp.h	2025-01-13 18:26:44.616856342 +0800
 @@ -0,0 +1,21 @@
 +#ifndef AVCODEC_NTSILK_SKP_H
 +#define AVCODEC_NTSILK_SKP_H
